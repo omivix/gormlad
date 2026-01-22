@@ -3,7 +3,7 @@ module github.com/omivix/gormlad
 go 1.25.6
 
 require (
-	github.com/omivix/lad v1.0.3
+	github.com/omivix/lad v1.0.4
 	go.uber.org/zap v1.27.1
 	gorm.io/driver/mysql v1.6.0
 	gorm.io/gorm v1.31.1
