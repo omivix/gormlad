@@ -38,4 +38,6 @@ func TestErrorLog(t *testing.T) {
 		lad.L().Error("connect mysql error", lad.Error(err))
 		return
 	}
+
+	gormlad.New(lad.L())
 }

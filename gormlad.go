@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/omivix/lad"
-	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -22,9 +21,15 @@ func New(lg *lad.Logger) *Logger {
 	return &Logger{
 		lg:                        lg,
 		level:                     logger.Warn,
-		slowThreshold:             800 * time.Millisecond,
+		slowThreshold:             200 * time.Millisecond,
 		ignoreRecordNotFoundError: true,
 	}
+}
+
+func (l *Logger) SetSlowThreshold(d time.Duration) logger.Interface {
+	cp := *l
+	cp.slowThreshold = d
+	return &cp
 }
 
 func (l *Logger) LogMode(level logger.LogLevel) logger.Interface {
@@ -62,15 +67,15 @@ func (l *Logger) Trace(ctx context.Context, begin time.Time, fc func() (string, 
 	elapsed := time.Since(begin)
 	sql, rows := fc()
 
-	fields := []zap.Field{
-		zap.Duration("elapsed", elapsed),
-		zap.Int64("rows", rows),
-		zap.String("sql", sql),
+	fields := []lad.Field{
+		lad.Duration("elapsed", elapsed),
+		lad.Int64("rows", rows),
+		lad.String("sql", sql),
 	}
 
 	// error
 	if err != nil && !(l.ignoreRecordNotFoundError && errors.Is(err, gorm.ErrRecordNotFound)) {
-		l.lg.Error("gorm query", append(fields, zap.Error(err))...)
+		l.lg.Error("gorm query", append(fields, lad.Error(err))...)
 		return
 	}
 
